@@ -30,9 +30,11 @@
                                 <div class="task-deadline">
                                     <i class="fa-regular fa-calendar"></i> {{ task.deadline | date("m/d/Y") }}
                                 </div>
-                                <div class="mini-user">
-                                    DB
-                                </div>
+                                {% if task.user %}
+                                    <div class="mini-user">
+                                        {{ task.user.getSignature() }}
+                                    </div>
+                                {% endif %}
                             </div>
                         </a>
                     {% endfor %}

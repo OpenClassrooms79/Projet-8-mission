@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -32,11 +34,22 @@ class User
     #[ORM\Column]
     private ?bool $enabled = null;
 
-    #[ORM\Column]
-    private ?int $contractId = null;
-
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $entryDate = null;
+
+    /**
+     * @var Collection<int, Task>
+     */
+    #[ORM\OneToMany(targetEntity: Task::class, mappedBy: 'user')]
+    private Collection $tasks;
+
+    #[ORM\ManyToOne(inversedBy: 'users')]
+    private ?Contract $contract = null;
+
+    public function __construct()
+    {
+        $this->tasks = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -122,18 +135,6 @@ class User
         return $this;
     }
 
-    public function getContractId(): ?int
-    {
-        return $this->contractId;
-    }
-
-    public function setContractId(int $contractId): static
-    {
-        $this->contractId = $contractId;
-
-        return $this;
-    }
-
     public function getEntryDate(): ?\DateTimeInterface
     {
         return $this->entryDate;
@@ -146,8 +147,50 @@ class User
         return $this;
     }
 
-    /*public static function getSignature(User $user): string
+    public function getSignature(): string
     {
-        return $user->firstName[0] . $user->name[0];
-    }*/
+        return $this->firstName[0] . $this->name[0];
+    }
+
+    /**
+     * @return Collection<int, Task>
+     */
+    public function getTasks(): Collection
+    {
+        return $this->tasks;
+    }
+
+    public function addTask(Task $task): static
+    {
+        if (!$this->tasks->contains($task)) {
+            $this->tasks->add($task);
+            $task->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTask(Task $task): static
+    {
+        if ($this->tasks->removeElement($task)) {
+            // set the owning side to null (unless already changed)
+            if ($task->getUser() === $this) {
+                $task->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getContract(): ?Contract
+    {
+        return $this->contract;
+    }
+
+    public function setContract(?Contract $contract): static
+    {
+        $this->contract = $contract;
+
+        return $this;
+    }
 }

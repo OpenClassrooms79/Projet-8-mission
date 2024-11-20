@@ -23,11 +23,11 @@ class Task
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $deadline = null;
 
-    #[ORM\Column]
-    private ?int $projectId = null;
+    #[ORM\ManyToOne(inversedBy: 'tasks')]
+    private ?Project $project = null;
 
-    #[ORM\Column]
-    private ?int $userId = null;
+    #[ORM\ManyToOne(inversedBy: 'tasks')]
+    private ?User $user = null;
 
     #[ORM\Column]
     private ?int $statusId = null;
@@ -80,26 +80,26 @@ class Task
         return $this;
     }
 
-    public function getProjectId(): ?int
+    public function getProject(): ?Project
     {
-        return $this->projectId;
+        return $this->project;
     }
 
-    public function setProjectId(int $projectId): static
+    public function setProject(?Project $project): static
     {
-        $this->projectId = $projectId;
+        $this->project = $project;
 
         return $this;
     }
 
-    public function getUserId(): ?int
+    public function getUser(): ?User
     {
-        return $this->userId;
+        return $this->user;
     }
 
-    public function setUserId(int $userId): static
+    public function setUser(?User $user): static
     {
-        $this->userId = $userId;
+        $this->user = $user;
 
         return $this;
     }
@@ -109,10 +109,15 @@ class Task
         return $this->statusId;
     }
 
-    public function setStatusId(int $statusId): static
+    public function setStatusId(?int $statusId): static
     {
         $this->statusId = $statusId;
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return sprintf("Tâche %d - %s\n", $this->id, $this->title);
     }
 }

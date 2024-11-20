@@ -1,109 +1,63 @@
 <?php
+// Exécution du script : symfony console doctrine:fixtures:load
 
 namespace App\DataFixtures;
 
 use App\Entity\Contract;
 use App\Entity\Project;
-use App\Entity\Status;
-use App\Entity\Tag;
 use App\Entity\Task;
 use App\Entity\User;
+use App\Status;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\ORM\Id\AssignedGenerator;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ObjectManager;
 use Faker;
 
+use function array_rand;
 use function random_int;
 use function sprintf;
 
-require_once 'vendor/autoload.php';
-
 class AppFixtures extends Fixture
 {
-    public const NB_CONTRACTS = 3;
-    public const NB_STATUS = 10;
-    public const NB_TAGS = 10;
+    public const CONTRACTS = ['CDD', 'CDI', 'Freelance'];
     public const NB_ROLES = 2;
     public const NB_USERS = 20;
     public const NB_PROJECTS = 4;
     public const MAX_PROJECT_DAYS = 730;
     public const NB_TASKS = 100;
 
+    private array $contracts = [];
+    private array $users = [];
+    private array $projects = [];
+
     public function load(ObjectManager $manager): void
     {
         $faker = Faker\Factory::create();
 
         $this->loadContracts($manager);
-        $this->loadStatuses($manager, $faker);
-        $this->loadTags($manager, $faker);
         $this->loadUsers($manager, $faker);
         $this->loadProjects($manager, $faker);
         $this->loadTasks($manager, $faker);
-
-        $manager->flush();
-    }
-
-    public function allowForcingIdValue(objectManager $manager, string $entity_class): void
-    {
-        $metadata = $manager->getClassMetadata($entity_class);
-        $metadata->setIdGenerator(new AssignedGenerator());
-        $metadata->setIdGeneratorType(ClassMetadata::GENERATOR_TYPE_NONE);
     }
 
     public function loadContracts(ObjectManager $manager): void
     {
-        $this->allowForcingIdValue($manager, Contract::class);
-
-        $contract = new Contract();
-        $contract->setId(1)->setName('CDD');
-        $manager->persist($contract);
-
-        $contract = new Contract();
-        $contract->setId(2)->setName('CDI');
-        $manager->persist($contract);
-
-        $contract = new Contract();
-        $contract->setId(3)->setName('Freelance');
-        $manager->persist($contract);
-    }
-
-    public function loadStatuses(ObjectManager $manager, Faker\Generator $faker): void
-    {
-        $this->allowForcingIdValue($manager, Status::class);
-
-        for ($i = 1; $i <= self::NB_STATUS; $i++) {
-            $status = new Status();
-            $status
-                ->setId($i)
-                ->setName($faker->slug . '_status')
-                ->setProjectId(random_int(1, self::NB_PROJECTS));
-            $manager->persist($status);
+        foreach (self::CONTRACTS as $contractName) {
+            $contract = new Contract();
+            $contract->setName($contractName);
+            $manager->persist($contract);
         }
-    }
+        $manager->flush();
 
-    public function loadTags(ObjectManager $manager, Faker\Generator $faker): void
-    {
-        $this->allowForcingIdValue($manager, Tag::class);
-
-        for ($i = 1; $i <= self::NB_TAGS; $i++) {
-            $tag = new Tag();
-            $tag
-                ->setId($i)
-                ->setName($faker->slug . '_tag');
-            $manager->persist($tag);
-        }
+        $this->contracts = $manager->getRepository(Contract::class)->findAll();
     }
 
     public function loadUsers(ObjectManager $manager, Faker\Generator $faker): void
     {
-        $this->allowForcingIdValue($manager, User::class);
-
         for ($i = 1; $i <= self::NB_USERS; $i++) {
             $user = new User();
             $user
                 ->setId($i)
-                ->setContractId(random_int(1, self::NB_CONTRACTS))
+                ->setContract($this->contracts[array_rand($this->contracts)])
                 ->setFirstName($faker->firstName())
                 ->setName($faker->lastName())
                 ->setEmail($faker->email())
@@ -113,12 +67,13 @@ class AppFixtures extends Fixture
                 ->setEntryDate($faker->dateTimeBetween('-10 year'));
             $manager->persist($user);
         }
+        $manager->flush();
+
+        $this->users = $manager->getRepository(User::class)->findAll();
     }
 
     public function loadProjects(ObjectManager $manager, Faker\Generator $faker): void
     {
-        $this->allowForcingIdValue($manager, Project::class);
-
         for ($i = 1; $i <= self::NB_PROJECTS; $i++) {
             $start = $faker->dateTimeBetween('-5 year');
             $format = sprintf('+%d day', random_int(1, self::MAX_PROJECT_DAYS));
@@ -135,23 +90,29 @@ class AppFixtures extends Fixture
 
             $manager->persist($project);
         }
+        $manager->flush();
+
+        $this->projects = $manager->getRepository(Project::class)->findAll();
     }
 
     public function loadTasks(ObjectManager $manager, Faker\Generator $faker): void
     {
-        $this->allowForcingIdValue($manager, Task::class);
-
         for ($i = 1; $i <= self::NB_TASKS; $i++) {
             $task = new Task();
+            $statusId = Status::getRandom();
             $task
                 ->setId($i)
                 ->setTitle('Tâche ' . $faker->city())
                 ->setDescription($faker->text())
                 ->setDeadline($faker->dateTimeBetween('-5 year'))
-                ->setProjectId(random_int(1, self::NB_PROJECTS))
-                ->setStatusId(random_int(1, self::NB_STATUS))
-                ->setUserId(random_int(1, self::NB_USERS));
+                ->setProject($this->projects[array_rand($this->projects)])
+                ->setStatusId($statusId);
+            if ($statusId !== Status::TO_DO) {
+                $task->setUser($this->users[array_rand($this->users)]);
+            }
+
             $manager->persist($task);
         }
+        $manager->flush();
     }
 }
