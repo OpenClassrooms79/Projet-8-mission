@@ -24,13 +24,13 @@ class Task
     private ?\DateTimeInterface $deadline = null;
 
     #[ORM\Column]
-    private ?int $project_id = null;
+    private ?int $projectId = null;
 
     #[ORM\Column]
-    private ?int $user_id = null;
+    private ?int $userId = null;
 
     #[ORM\Column]
-    private ?int $status_id = null;
+    private ?int $statusId = null;
 
     public function getId(): ?int
     {
@@ -82,36 +82,36 @@ class Task
 
     public function getProjectId(): ?int
     {
-        return $this->project_id;
+        return $this->projectId;
     }
 
-    public function setProjectId(int $project_id): static
+    public function setProjectId(int $projectId): static
     {
-        $this->project_id = $project_id;
+        $this->projectId = $projectId;
 
         return $this;
     }
 
     public function getUserId(): ?int
     {
-        return $this->user_id;
+        return $this->userId;
     }
 
-    public function setUserId(int $user_id): static
+    public function setUserId(int $userId): static
     {
-        $this->user_id = $user_id;
+        $this->userId = $userId;
 
         return $this;
     }
 
     public function getStatusId(): ?int
     {
-        return $this->status_id;
+        return $this->statusId;
     }
 
-    public function setStatusId(int $status_id): static
+    public function setStatusId(int $statusId): static
     {
-        $this->status_id = $status_id;
+        $this->statusId = $statusId;
 
         return $this;
     }

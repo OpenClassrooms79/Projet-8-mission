@@ -32,8 +32,8 @@ class User
     #[ORM\Column]
     private ?bool $enabled = null;
 
-    #[ORM\Column(length: 100)]
-    private ?string $contract = null;
+    #[ORM\Column]
+    private ?int $contractId = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $entryDate = null;
@@ -122,14 +122,14 @@ class User
         return $this;
     }
 
-    public function getContract(): ?string
+    public function getContractId(): ?int
     {
-        return $this->contract;
+        return $this->contractId;
     }
 
-    public function setContract(string $contract): static
+    public function setContractId(int $contractId): static
     {
-        $this->contract = $contract;
+        $this->contractId = $contractId;
 
         return $this;
     }
@@ -145,4 +145,9 @@ class User
 
         return $this;
     }
+
+    /*public static function getSignature(User $user): string
+    {
+        return $user->firstName[0] . $user->name[0];
+    }*/
 }
