@@ -19,4 +19,19 @@ class MainController extends AbstractController
             'projects' => $projectRepository->findAll(),
         ]);
     }
+
+    #[Route('/projets/{id}', name: 'app_project')]
+    public function project(ProjectRepository $projectRepository, TaskRepository $taskRepository, UserRepository $userRepository, int $id): Response
+    {
+        return $this->render('project.html.twig', [
+            'project' => $projectRepository->findOneBy(['id' => $id]),
+            'tasks' => [
+                Status::TO_DO => $taskRepository->findBy(['projectId' => $id, 'statusId' => Status::TO_DO]),
+                Status::DOING => $taskRepository->findBy(['projectId' => $id, 'statusId' => Status::DOING]),
+                Status::DONE => $taskRepository->findBy(['projectId' => $id, 'statusId' => Status::DONE]),
+            ],
+            'statuses' => Status::STATUSES,
+            'users' => $userRepository->findAll(),
+        ]);
+    }
 }
