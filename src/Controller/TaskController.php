@@ -2,10 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\Task;
 use App\Form\TaskType;
 use App\Repository\TaskRepository;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,5 +35,16 @@ class TaskController extends AbstractController
             'form' => $form,
             'task' => $task,
         ]);
+    }
+
+    #[Route('/tache/{id}/supprimer', name: 'app_task_delete', requirements: ['id' => Requirement::POSITIVE_INT])]
+    public function delete(EntityManagerInterface $entityManager, TaskRepository $taskRepository, int $id): Response
+    {
+        $task = $taskRepository->findOneBy(['id' => $id]);
+        if ($task !== null) {
+            $entityManager->remove($task);
+            $entityManager->flush();
+        }
+        return $this->redirectToRoute('app_project_show', ['id' => $task->getProject()->getId()]);
     }
 }
