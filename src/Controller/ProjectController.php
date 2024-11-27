@@ -25,4 +25,22 @@ class ProjectController extends AbstractController
             'projects' => $projectRepository->findAll(),
         ]);
     }
+
+    #[Route('/projets/{id}', name: 'app_project_show', requirements: ['id' => Requirement::POSITIVE_INT])]
+    public function show(ProjectRepository $projectRepository, int $id): Response
+    {
+        $project = $projectRepository->findOneBy(['id' => $id]);
+        $sortedTasks = [];
+        $tasks = $project->getTasks();
+        foreach ($tasks as $task) {
+            $sortedTasks[$task->getStatusId()][] = $task;
+        }
+        ksort($sortedTasks);
+
+        return $this->render('project.html.twig', [
+            'project' => $project,
+            'tasks' => $sortedTasks,
+            'statuses' => Status::STATUSES,
+        ]);
+    }
 }

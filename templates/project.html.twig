@@ -23,7 +23,7 @@
                 <h2>{{ statuses[status] }}</h2>
                 <div class="tasks-list">
                     {% for task in tasks[status] %}
-                        <a class="task" href="taches/{{ task.id }}">
+                        <a class="task" href="/tache/{{ task.id }}/modifier">
                             <h3>{{ task.title }}</h3>
                             <p>{{ task.description }}</p>
                             <div class="task-infos">
