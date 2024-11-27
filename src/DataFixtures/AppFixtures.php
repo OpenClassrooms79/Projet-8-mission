@@ -20,10 +20,10 @@ class AppFixtures extends Fixture
 {
     public const CONTRACTS = ['CDD', 'CDI', 'Freelance'];
     public const NB_ROLES = 2;
-    public const NB_USERS = 20;
-    public const NB_PROJECTS = 4;
+    public const NB_USERS = 40;
+    public const NB_PROJECTS = 8;
     public const MAX_PROJECT_DAYS = 730;
-    public const NB_TASKS = 100;
+    public const NB_TASKS = 200;
 
     private array $contracts = [];
     private array $users = [];
