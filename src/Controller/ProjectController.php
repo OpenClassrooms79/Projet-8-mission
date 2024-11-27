@@ -43,4 +43,19 @@ class ProjectController extends AbstractController
             'statuses' => Status::STATUSES,
         ]);
     }
+
+    #[Route('/projet/{id}/supprimer', name: 'app_project_delete', requirements: ['id' => Requirement::POSITIVE_INT])]
+    public function delete(Project $project, EntityManagerInterface $entityManager): Response
+    {
+        // suppression de toutes les tâches du projet
+        foreach ($project->getTasks() as $task) {
+            $entityManager->remove($task);
+        }
+
+        //suppression du projet
+        $entityManager->remove($project);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('app_main');
+    }
 }
