@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Project;
 use App\Form\ProjectType;
 use App\Repository\ProjectRepository;
+use App\Repository\UserRepository;
 use App\Status;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -42,6 +43,32 @@ class ProjectController extends AbstractController
             'tasks' => $sortedTasks,
             'statuses' => Status::STATUSES,
         ]);
+    }
+
+    #[Route('/projets/nouveau', name: 'app_project_create')]
+    public function create(Request $request, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
+    {
+        $project = new Project();
+
+        $form = $this->createForm(ProjectType::class, $project);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $project = $form->getData();
+            //print_r($project);
+
+            $entityManager->persist($project);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_project_show', ['id' => $project->getId()]);
+        }
+        return $this->render(
+            'project-add.html.twig',
+            [
+                'form' => $form,
+                'users' => $userRepository->findAll(),
+            ],
+        );
     }
 
     #[Route('/projet/{id}/supprimer', name: 'app_project_delete', requirements: ['id' => Requirement::POSITIVE_INT])]

@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau projet - {{ parent() }}{% endblock %}
+
+{% block header %}
+    <div id="current-user"></div>
+    <div id="title-page">
+        <h1>Nouveau projet</h1>
+    </div>
+{% endblock %}
+
+{% block content %}
+    {{ form_start(form) }}
+    <div>
+        {{ form_row(form.name) }}
+    </div>
+
+    <div>
+        <label for="projet_employes">Inviter des membres</label>
+        <select id="projet_employes" name="projet[employes][]" multiple="multiple">
+            {% for user in users %}
+                <option value="{{ user.id }}">{{ user.fullname }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <br>
+    <button class="button button-submit">Continuer</button>
+    {{ form_end(form) }}
+{% endblock %}
