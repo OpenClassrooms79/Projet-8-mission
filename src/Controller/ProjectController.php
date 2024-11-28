@@ -11,6 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 use Symfony\Component\Routing\Requirement\Requirement;
@@ -31,6 +32,9 @@ class ProjectController extends AbstractController
     public function show(ProjectRepository $projectRepository, int $id): Response
     {
         $project = $projectRepository->findOneBy(['id' => $id]);
+        if ($project === null) {
+            throw new NotFoundHttpException('Ce projet n\'existe pas.');
+        }
         $sortedTasks = [];
         $tasks = $project->getTasks();
         foreach ($tasks as $task) {
@@ -81,6 +85,9 @@ class ProjectController extends AbstractController
     public function edit(Request $request, Project $id, EntityManagerInterface $entityManager, ProjectRepository $projectRepository, UserRepository $userRepository): Response
     {
         $project = $projectRepository->findOneBy(['id' => $id]);
+        if ($project === null) {
+            throw new NotFoundHttpException('Ce projet n\'existe pas.');
+        }
 
         $form = $this->createForm(ProjectType::class, [
             'project' => $project,

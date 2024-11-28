@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 
@@ -19,6 +20,9 @@ class TaskController extends AbstractController
     public function create(Request $request, EntityManagerInterface $entityManager, ProjectRepository $projectRepository, int $id): Response
     {
         $project = $projectRepository->findOneBy(['id' => $id]);
+        if ($project === null) {
+            throw new NotFoundHttpException('Ce projet n\'existe pas.');
+        }
         $task = new Task();
 
         $form = $this->createForm(TaskType::class, $task);
@@ -73,6 +77,10 @@ class TaskController extends AbstractController
             $entityManager->remove($task);
             $entityManager->flush();
         }
-        return $this->redirectToRoute('app_project_show', ['id' => $task->getProject()->getId()]);
+        $project = $task->getProject();
+        if ($project === null) {
+            return $this->redirectToRoute('app_main');
+        }
+        return $this->redirectToRoute('app_project_show', ['id' => $project->getId()]);
     }
 }
