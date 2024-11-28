@@ -1,11 +1,21 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nouveau projet - {{ parent() }}{% endblock %}
+{% block title %}{% if project_name==null %}
+    Nouveau projet
+{% else %}
+    {{ project_name }}
+{% endif %} - {{ parent() }}{% endblock %}
 
 {% block header %}
     <div id="current-user"></div>
     <div id="title-page">
-        <h1>Nouveau projet</h1>
+        <h1>
+            {% if project_name==null %}
+                Nouveau projet
+            {% else %}
+                {{ project_name }}
+            {% endif %}
+        </h1>
     </div>
 {% endblock %}
 

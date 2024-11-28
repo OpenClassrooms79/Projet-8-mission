@@ -159,4 +159,11 @@ class Project
 
         return $this;
     }
+
+    public function removeAllUsers(): static
+    {
+        $this->users->clear();
+
+        return $this;
+    }
 }

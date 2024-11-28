@@ -38,7 +38,7 @@ class ProjectController extends AbstractController
         }
         ksort($sortedTasks);
 
-        return $this->render('project.html.twig', [
+        return $this->render('project/show.html.twig', [
             'project' => $project,
             'tasks' => $sortedTasks,
             'statuses' => Status::STATUSES,
@@ -52,7 +52,8 @@ class ProjectController extends AbstractController
 
         $form = $this->createForm(ProjectType::class, [
             'project' => $project,
-            'users' => $userRepository->findAll(),
+            'users' => $project->getUsers()->toArray(),
+            'all_users' => $userRepository->findAll(),
         ]);
 
         $form->handleRequest($request);
@@ -68,9 +69,44 @@ class ProjectController extends AbstractController
             return $this->redirectToRoute('app_project_show', ['id' => $project->getId()]);
         }
         return $this->render(
-            'project/add.html.twig',
+            'project/add-edit.html.twig',
             [
                 'form' => $form,
+                'project_name' => '',
+            ],
+        );
+    }
+
+    #[Route('/projet/{id}/modifier', name: 'app_project_edit', requirements: ['id' => Requirement::POSITIVE_INT])]
+    public function edit(Request $request, Project $id, EntityManagerInterface $entityManager, ProjectRepository $projectRepository, UserRepository $userRepository): Response
+    {
+        $project = $projectRepository->findOneBy(['id' => $id]);
+
+        $form = $this->createForm(ProjectType::class, [
+            'project' => $project,
+            'users' => $project->getUsers()->toArray(),
+            'all_users' => $userRepository->findAll(),
+        ]);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $project->setName($form->getData()['name']);
+            $project->removeAllUsers();
+            foreach ($form->getData()['users'] as $user) {
+                $project->addUser($user);
+            }
+
+            $entityManager->persist($project);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_project_show', ['id' => $project->getId()]);
+        }
+
+        return $this->render(
+            'project/add-edit.html.twig',
+            [
+                'form' => $form,
+                'project_name' => $project->getName(),
             ],
         );
     }
