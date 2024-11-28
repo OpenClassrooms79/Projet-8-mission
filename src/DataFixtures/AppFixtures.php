@@ -24,6 +24,7 @@ class AppFixtures extends Fixture
     public const NB_PROJECTS = 8;
     public const MAX_PROJECT_DAYS = 730;
     public const NB_TASKS = 200;
+    public const NB_MAX_USERS_PER_PROJECT = 10;
 
     private array $contracts = [];
     private array $users = [];
@@ -88,7 +89,8 @@ class AppFixtures extends Fixture
                 ->setStartDate($start)
                 ->setDeadline($end);
 
-            for ($n = 0; $i < random_int(1, self::NB_USERS); $n++) {
+            // ajout d'utilisateurs au projet
+            for ($n = 0; $n < min(self::NB_MAX_USERS_PER_PROJECT, self::NB_USERS, random_int(1, self::NB_USERS)); $n++) {
                 $project->addUser($this->users[array_rand($this->users)]);
             }
 
@@ -104,15 +106,17 @@ class AppFixtures extends Fixture
         for ($i = 1; $i <= self::NB_TASKS; $i++) {
             $task = new Task();
             $statusId = Status::getRandom();
+            $project = $this->projects[array_rand($this->projects)];
+            $userArray = $project->getUsers()->toArray();
             $task
                 ->setId($i)
                 ->setTitle('Tâche ' . $faker->city())
                 ->setDescription($faker->text())
                 ->setDeadline($faker->dateTimeBetween('-5 year'))
-                ->setProject($this->projects[array_rand($this->projects)])
+                ->setProject($project)
                 ->setStatusId($statusId);
             if ($statusId !== Status::TO_DO) {
-                $task->setUser($this->users[array_rand($this->users)]);
+                $task->setUser($userArray[array_rand($userArray)]);
             }
 
             $manager->persist($task);
