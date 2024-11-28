@@ -17,14 +17,14 @@
                     <h2>{{ project.name }}</h2>
                 </a>
                 <div class="card-project-icons">
-                    <a href="projet-edit.html"><i class="fa-solid fa-pen"></i></a>
+                    <a href="projet/{{ project.id }}/modifier"><i class="fa-solid fa-pen"></i></a>
                     <a href="projet/{{ project.id }}/supprimer"><i class="fa-solid fa-trash"></i></a>
                 </div>
             </article>
         {% endfor %}
 
         <article class="card-project">
-            <a href="/projets/creer">
+            <a href="projet/creer">
                 <i class="fa-solid fa-circle-plus add-project-icon"></i>
                 <h2>Ajouter un projet</h2>
             </a>
