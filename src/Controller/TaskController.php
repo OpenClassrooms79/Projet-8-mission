@@ -49,6 +49,9 @@ class TaskController extends AbstractController
     public function edit(Request $request, EntityManagerInterface $entityManager, TaskRepository $taskRepository, int $id): Response
     {
         $task = $taskRepository->findOneBy(['id' => $id]);
+        if ($task === null) {
+            throw new NotFoundHttpException('Cette tâche n\'existe pas.');
+        }
 
         $form = $this->createForm(TaskType::class, $task);
 
@@ -73,10 +76,13 @@ class TaskController extends AbstractController
     public function delete(EntityManagerInterface $entityManager, TaskRepository $taskRepository, int $id): Response
     {
         $task = $taskRepository->findOneBy(['id' => $id]);
-        if ($task !== null) {
-            $entityManager->remove($task);
-            $entityManager->flush();
+        if ($task === null) {
+            throw new NotFoundHttpException('Cette tâche n\'existe pas.');
         }
+
+        $entityManager->remove($task);
+        $entityManager->flush();
+
         $project = $task->getProject();
         if ($project === null) {
             return $this->redirectToRoute('app_main');
