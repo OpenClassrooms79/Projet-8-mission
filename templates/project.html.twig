@@ -8,8 +8,9 @@
         <div class="flex-header">
             <h1>{{ project.name }}</h1>
             <div class="user-list">
-                <div class="avatar">ND</div>
-                <div class="avatar">DB</div>
+                {% for user in project.users %}
+                    <div class="avatar">{{ user.getSignature() }}</div>
+                {% endfor %}
             </div>
             <a class="button" href="projets/{{ project.id }}/edit">Modifier</a>
         </div>

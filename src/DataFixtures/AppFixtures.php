@@ -88,6 +88,10 @@ class AppFixtures extends Fixture
                 ->setStartDate($start)
                 ->setDeadline($end);
 
+            for ($n = 0; $i < random_int(1, self::NB_USERS); $n++) {
+                $project->addUser($this->users[array_rand($this->users)]);
+            }
+
             $manager->persist($project);
         }
         $manager->flush();
