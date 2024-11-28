@@ -16,12 +16,7 @@
     </div>
 
     <div>
-        <label for="projet_employes">Inviter des membres</label>
-        <select id="projet_employes" name="projet[employes][]" multiple="multiple">
-            {% for user in users %}
-                <option value="{{ user.id }}">{{ user.fullname }}</option>
-            {% endfor %}
-        </select>
+        {{ form_row(form.users) }}
     </div>
     <br>
     <button class="button button-submit">Continuer</button>

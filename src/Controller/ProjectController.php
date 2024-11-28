@@ -50,11 +50,17 @@ class ProjectController extends AbstractController
     {
         $project = new Project();
 
-        $form = $this->createForm(ProjectType::class, $project);
+        $form = $this->createForm(ProjectType::class, [
+            'project' => $project,
+            'users' => $userRepository->findAll(),
+        ]);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $project = $form->getData();
+            $project->setName($form->getData()['name']);
+            foreach ($form->getData()['users'] as $user) {
+                $project->addUser($user);
+            }
 
             $entityManager->persist($project);
             $entityManager->flush();
@@ -62,10 +68,9 @@ class ProjectController extends AbstractController
             return $this->redirectToRoute('app_project_show', ['id' => $project->getId()]);
         }
         return $this->render(
-            'project-add.html.twig',
+            'project/add.html.twig',
             [
                 'form' => $form,
-                'users' => $userRepository->findAll(),
             ],
         );
     }
