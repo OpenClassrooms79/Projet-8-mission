@@ -154,7 +154,7 @@ class User
         return $this;
     }
 
-    public function getSignature(): string
+    public function getInitials(): string
     {
         return $this->firstName[0] . $this->name[0];
     }

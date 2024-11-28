@@ -9,7 +9,7 @@
             <h1>{{ project.name }}</h1>
             <div class="user-list">
                 {% for user in project.users %}
-                    <div class="avatar">{{ user.getSignature() }}</div>
+                    <div class="avatar" title="{{ user.fullname }}">{{ user.initials }}</div>
                 {% endfor %}
             </div>
             <a class="button" href="projets/{{ project.id }}/edit">Modifier</a>
@@ -32,8 +32,8 @@
                                     <i class="fa-regular fa-calendar"></i> {{ task.deadline | date("m/d/Y") }}
                                 </div>
                                 {% if task.user %}
-                                    <div class="mini-user">
-                                        {{ task.user.getSignature() }}
+                                    <div class="mini-user" title="{{ task.user.fullname }}">
+                                        {{ task.user.initials }}
                                     </div>
                                 {% endif %}
                             </div>
