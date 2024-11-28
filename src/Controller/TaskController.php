@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\Task;
 use App\Form\TaskType;
+use App\Repository\ProjectRepository;
 use App\Repository\TaskRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -13,6 +15,32 @@ use Symfony\Component\Routing\Requirement\Requirement;
 
 class TaskController extends AbstractController
 {
+    #[Route('/projet/{id}/tache/creer', name: 'app_task_create')]
+    public function create(Request $request, EntityManagerInterface $entityManager, ProjectRepository $projectRepository, int $id): Response
+    {
+        $project = $projectRepository->findOneBy(['id' => $id]);
+        $task = new Task();
+
+        $form = $this->createForm(TaskType::class, $task);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $task = $form->getData();
+            $task->setProject($project);
+
+            $entityManager->persist($task);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_project_show', ['id' => $project->getId()]);
+        }
+
+        return $this->render('task/add.html.twig', [
+            'controller_name' => 'TaskController',
+            'task' => $task,
+            'form' => $form,
+        ]);
+    }
+
     #[Route('/tache/{id}/modifier', name: 'app_task_edit')]
     public function edit(Request $request, EntityManagerInterface $entityManager, TaskRepository $taskRepository, int $id): Response
     {

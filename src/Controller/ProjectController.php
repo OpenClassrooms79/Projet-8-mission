@@ -27,7 +27,7 @@ class ProjectController extends AbstractController
         ]);
     }
 
-    #[Route('/projets/{id}', name: 'app_project_show', requirements: ['id' => Requirement::POSITIVE_INT])]
+    #[Route('/projet/{id}', name: 'app_project_show', requirements: ['id' => Requirement::POSITIVE_INT])]
     public function show(ProjectRepository $projectRepository, int $id): Response
     {
         $project = $projectRepository->findOneBy(['id' => $id]);
@@ -45,7 +45,7 @@ class ProjectController extends AbstractController
         ]);
     }
 
-    #[Route('/projets/nouveau', name: 'app_project_create')]
+    #[Route('/projet/creer', name: 'app_project_create')]
     public function create(Request $request, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
     {
         $project = new Project();
@@ -55,7 +55,6 @@ class ProjectController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $project = $form->getData();
-            //print_r($project);
 
             $entityManager->persist($project);
             $entityManager->flush();

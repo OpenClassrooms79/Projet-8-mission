@@ -2,11 +2,12 @@
 
 namespace App\Form;
 
-use App\Entity\Project;
 use App\Entity\Task;
 use App\Entity\User;
+use App\Status;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -21,16 +22,15 @@ class TaskType extends AbstractType
             ->add('title', TextType::class, ['label' => 'Titre de la tâche'])
             ->add('description', TextareaType::class, ['label' => 'Description'])
             ->add('deadline', DateType::class, ['label' => 'Date'])
-            ->add('statusId')
-            ->add('project', EntityType::class, [
-                'class' => Project::class,
-                'choice_label' => 'id',
+            ->add('statusId', ChoiceType::class, [
+                'label' => 'Statut',
+                'choices' => array_flip(Status::STATUSES),
             ])
             ->add('user', EntityType::class, [
                 'class' => User::class,
                 'label' => 'Membre',
                 'choice_label' => function (User $user) {
-                    return $user->getFirstName() . ' ' . $user->getName();
+                    return $user->getFullName();
                 },
             ]);
     }
