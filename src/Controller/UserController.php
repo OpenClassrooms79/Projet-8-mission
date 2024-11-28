@@ -2,21 +2,44 @@
 
 namespace App\Controller;
 
+use App\Form\UserType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 
 class UserController extends AbstractController
 {
-    #[Route('/employes', name: 'app_user')]
+    #[Route('/employes', name: 'app_users')]
     public function index(UserRepository $userRepository): Response
     {
         return $this->render('user/index.html.twig', [
             'controller_name' => 'UserController',
             'users' => $userRepository->findAll(),
+        ]);
+    }
+
+    #[Route('/employe/{id}/modifier', name: 'app_user_edit', requirements: ['id' => Requirement::POSITIVE_INT])]
+    public function edit(Request $request, UserRepository $userRepository, EntityManagerInterface $entityManager, int $id): Response
+    {
+        $user = $userRepository->findOneBy(['id' => $id]);
+
+        $form = $this->createForm(UserType::class, $user);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user = $form->getData();
+            $entityManager->persist($user);
+            $entityManager->flush();
+            return $this->redirectToRoute('app_users');
+        }
+
+        return $this->render('user/edit.html.twig', [
+            'user' => $user,
+            'form' => $form,
         ]);
     }
 
@@ -28,6 +51,6 @@ class UserController extends AbstractController
             $entityManager->remove($user);
             $entityManager->flush();
         }
-        return $this->redirectToRoute('app_user');
+        return $this->redirectToRoute('app_users');
     }
 }
