@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\TaskRepository;
+use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -21,7 +22,7 @@ class Task
     private ?string $description = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $deadline = null;
+    private ?DateTimeInterface $deadline = null;
 
     #[ORM\ManyToOne(inversedBy: 'tasks')]
     private ?Project $project = null;
@@ -68,12 +69,12 @@ class Task
         return $this;
     }
 
-    public function getDeadline(): ?\DateTimeInterface
+    public function getDeadline(): ?DateTimeInterface
     {
         return $this->deadline;
     }
 
-    public function setDeadline(?\DateTimeInterface $deadline): static
+    public function setDeadline(?DateTimeInterface $deadline): static
     {
         $this->deadline = $deadline;
 

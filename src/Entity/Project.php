@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ProjectRepository;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -20,10 +21,10 @@ class Project
     private ?string $name = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $startDate = null;
+    private ?DateTimeInterface $startDate = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $deadline = null;
+    private ?DateTimeInterface $deadline = null;
 
     #[ORM\Column]
     private ?bool $archived = false;
@@ -70,24 +71,24 @@ class Project
         return $this;
     }
 
-    public function getStartDate(): ?\DateTimeInterface
+    public function getStartDate(): ?DateTimeInterface
     {
         return $this->startDate;
     }
 
-    public function setStartDate(\DateTimeInterface $startDate): static
+    public function setStartDate(DateTimeInterface $startDate): static
     {
         $this->startDate = $startDate;
 
         return $this;
     }
 
-    public function getDeadline(): ?\DateTimeInterface
+    public function getDeadline(): ?DateTimeInterface
     {
         return $this->deadline;
     }
 
-    public function setDeadline(?\DateTimeInterface $deadline): static
+    public function setDeadline(?DateTimeInterface $deadline): static
     {
         $this->deadline = $deadline;
 

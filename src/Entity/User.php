@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -35,7 +36,7 @@ class User
     private ?bool $enabled = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $entryDate = null;
+    private ?DateTimeInterface $entryDate = null;
 
     /**
      * @var Collection<int, Task>
@@ -142,12 +143,12 @@ class User
         return $this;
     }
 
-    public function getEntryDate(): ?\DateTimeInterface
+    public function getEntryDate(): ?DateTimeInterface
     {
         return $this->entryDate;
     }
 
-    public function setEntryDate(\DateTimeInterface $entryDate): static
+    public function setEntryDate(DateTimeInterface $entryDate): static
     {
         $this->entryDate = $entryDate;
 
