@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Requirement\Requirement;
 
 class TaskController extends AbstractController
 {
-    #[Route('/projet/{id}/tache/creer', name: 'app_task_create')]
+    #[Route('/projet/{id}/tache/creer', name: 'task_create')]
     public function create(Request $request, EntityManagerInterface $entityManager, ProjectRepository $projectRepository, int $id): Response
     {
         $project = $projectRepository->findOneBy(['id' => $id]);
@@ -35,7 +35,7 @@ class TaskController extends AbstractController
             $entityManager->persist($task);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_project_show', ['id' => $project->getId()]);
+            return $this->redirectToRoute('project_show', ['id' => $project->getId()]);
         }
 
         return $this->render('task/add.html.twig', [
@@ -45,7 +45,7 @@ class TaskController extends AbstractController
         ]);
     }
 
-    #[Route('/tache/{id}/modifier', name: 'app_task_edit')]
+    #[Route('/tache/{id}/modifier', name: 'task_edit')]
     public function edit(Request $request, EntityManagerInterface $entityManager, TaskRepository $taskRepository, int $id): Response
     {
         $task = $taskRepository->findOneBy(['id' => $id]);
@@ -62,7 +62,7 @@ class TaskController extends AbstractController
             $entityManager->persist($task);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_project_show', ['id' => $task->getProject()->getId()]);
+            return $this->redirectToRoute('project_show', ['id' => $task->getProject()->getId()]);
         }
 
         return $this->render('task/edit.html.twig', [
@@ -72,7 +72,7 @@ class TaskController extends AbstractController
         ]);
     }
 
-    #[Route('/tache/{id}/supprimer', name: 'app_task_delete', requirements: ['id' => Requirement::POSITIVE_INT])]
+    #[Route('/tache/{id}/supprimer', name: 'task_delete', requirements: ['id' => Requirement::POSITIVE_INT])]
     public function delete(EntityManagerInterface $entityManager, TaskRepository $taskRepository, int $id): Response
     {
         $task = $taskRepository->findOneBy(['id' => $id]);
@@ -85,8 +85,8 @@ class TaskController extends AbstractController
 
         $project = $task->getProject();
         if ($project === null) {
-            return $this->redirectToRoute('app_main');
+            return $this->redirectToRoute('project_index');
         }
-        return $this->redirectToRoute('app_project_show', ['id' => $project->getId()]);
+        return $this->redirectToRoute('project_show', ['id' => $project->getId()]);
     }
 }

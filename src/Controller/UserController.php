@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Requirement\Requirement;
 
 class UserController extends AbstractController
 {
-    #[Route('/employes', name: 'app_users')]
+    #[Route('/employes', name: 'user_index')]
     public function index(UserRepository $userRepository): Response
     {
         return $this->render('user/index.html.twig', [
@@ -22,7 +22,7 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/employe/{id}/modifier', name: 'app_user_edit', requirements: ['id' => Requirement::POSITIVE_INT])]
+    #[Route('/employe/{id}/modifier', name: 'user_edit', requirements: ['id' => Requirement::POSITIVE_INT])]
     public function edit(Request $request, UserRepository $userRepository, EntityManagerInterface $entityManager, int $id): Response
     {
         $user = $userRepository->findOneBy(['id' => $id]);
@@ -34,7 +34,7 @@ class UserController extends AbstractController
             $user = $form->getData();
             $entityManager->persist($user);
             $entityManager->flush();
-            return $this->redirectToRoute('app_users');
+            return $this->redirectToRoute('user_index');
         }
 
         return $this->render('user/edit.html.twig', [
@@ -43,7 +43,7 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/employe/{id}/supprimer', name: 'app_user_delete', requirements: ['id' => Requirement::POSITIVE_INT])]
+    #[Route('/employe/{id}/supprimer', name: 'user_delete', requirements: ['id' => Requirement::POSITIVE_INT])]
     public function delete(EntityManagerInterface $entityManager, UserRepository $userRepository, int $id): Response
     {
         $user = $userRepository->findOneBy(['id' => $id]);
@@ -51,6 +51,6 @@ class UserController extends AbstractController
             $entityManager->remove($user);
             $entityManager->flush();
         }
-        return $this->redirectToRoute('app_users');
+        return $this->redirectToRoute('user_index');
     }
 }

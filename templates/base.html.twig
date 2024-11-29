@@ -27,12 +27,12 @@
             <img src="{{ asset('images/logo.png') }}" alt="Logo TaskLinker"/>
         </a>
         <ul id="main-menu">
-            <li{% if not(app.request.get('_route') starts with 'app_user') %} class="active"{% endif %}>
+            <li{% if (app.request.get('_route') starts with 'project') or (app.request.get('_route') starts with 'task') %} class="active"{% endif %}>
                 <a href="/">
                     <i class="fa-solid fa-list-check"></i> Projets
                 </a>
             </li>
-            <li{% if app.request.get('_route') starts with 'app_user' %} class="active"{% endif %}>
+            <li{% if (app.request.get('_route') starts with 'user') %} class="active"{% endif %}>
                 <a href="/employes">
                     <i class="fa-regular fa-user"></i> Équipe
                 </a>

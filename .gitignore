@@ -1,5 +1,6 @@
-/*.idea
-/*.lnk
+*.idea
+*.lnk
+desktop.ini
 
 ###> symfony/framework-bundle ###
 /.env.local

@@ -20,15 +20,15 @@ use function ksort;
 
 class ProjectController extends AbstractController
 {
-    #[Route('/', name: 'app_main')]
+    #[Route('/', name: 'project_index')]
     public function index(ProjectRepository $projectRepository): Response
     {
-        return $this->render('index.html.twig', [
+        return $this->render('project/index.html.twig', [
             'projects' => $projectRepository->findAll(),
         ]);
     }
 
-    #[Route('/projet/{id}', name: 'app_project_show', requirements: ['id' => Requirement::POSITIVE_INT])]
+    #[Route('/projet/{id}', name: 'project_show', requirements: ['id' => Requirement::POSITIVE_INT])]
     public function show(ProjectRepository $projectRepository, int $id): Response
     {
         $project = $projectRepository->findOneBy(['id' => $id]);
@@ -49,7 +49,7 @@ class ProjectController extends AbstractController
         ]);
     }
 
-    #[Route('/projet/creer', name: 'app_project_create')]
+    #[Route('/projet/creer', name: 'project_create')]
     public function create(Request $request, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
     {
         $project = new Project();
@@ -70,7 +70,7 @@ class ProjectController extends AbstractController
             $entityManager->persist($project);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_project_show', ['id' => $project->getId()]);
+            return $this->redirectToRoute('project_show', ['id' => $project->getId()]);
         }
         return $this->render(
             'project/add-edit.html.twig',
@@ -81,7 +81,7 @@ class ProjectController extends AbstractController
         );
     }
 
-    #[Route('/projet/{id}/modifier', name: 'app_project_edit', requirements: ['id' => Requirement::POSITIVE_INT])]
+    #[Route('/projet/{id}/modifier', name: 'project_edit', requirements: ['id' => Requirement::POSITIVE_INT])]
     public function edit(Request $request, Project $id, EntityManagerInterface $entityManager, ProjectRepository $projectRepository, UserRepository $userRepository): Response
     {
         $project = $projectRepository->findOneBy(['id' => $id]);
@@ -106,7 +106,7 @@ class ProjectController extends AbstractController
             $entityManager->persist($project);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_project_show', ['id' => $project->getId()]);
+            return $this->redirectToRoute('project_show', ['id' => $project->getId()]);
         }
 
         return $this->render(
@@ -118,7 +118,7 @@ class ProjectController extends AbstractController
         );
     }
 
-    #[Route('/projet/{id}/supprimer', name: 'app_project_delete', requirements: ['id' => Requirement::POSITIVE_INT])]
+    #[Route('/projet/{id}/supprimer', name: 'project_delete', requirements: ['id' => Requirement::POSITIVE_INT])]
     public function delete(Project $project, EntityManagerInterface $entityManager): Response
     {
         // suppression de toutes les tâches du projet
@@ -130,6 +130,6 @@ class ProjectController extends AbstractController
         $entityManager->remove($project);
         $entityManager->flush();
 
-        return $this->redirectToRoute('app_main');
+        return $this->redirectToRoute('project_index');
     }
 }
