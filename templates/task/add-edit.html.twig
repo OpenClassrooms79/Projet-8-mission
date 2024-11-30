@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Créer une tâche - {{ parent() }}{% endblock %}
+{% block title %}{% if task.title==null %}Créer une tâche{% else %}Gestion des droits d'accès{% endif %} - {{ parent() }}{% endblock %}
 
 {% block header %}
     <div id="current-user"></div>
     <div id="title-page">
-        <h1>Créer une tâche</h1>
+        <h1>{% if task.title==null %}Créer une tâche{% else %}Gestion des droits d'accès{% endif %}</h1>
     </div>
 {% endblock %}
 
@@ -31,8 +31,10 @@
         {{ form_row(form.user) }}
     </div>
     <br>
-    <button class="button button-submit">Modifier</button>
-    <a href="/tache/{{ task.id }}/supprimer" class="delete-task">Supprimer la tâche</a>
+    <button class="button button-submit">{% if task.title==null %}Ajouter{% else %}Modifier{% endif %}</button>
+    {% if task.title!=null %}
+        <a href="/tache/{{ task.id }}/supprimer" class="delete-task">Supprimer la tâche</a>
+    {% endif %}
     {{ form_rest(form) }}
     {{ form_end(form) }}
 {% endblock %}

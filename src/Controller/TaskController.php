@@ -6,8 +6,10 @@ use App\Entity\Task;
 use App\Form\TaskType;
 use App\Repository\ProjectRepository;
 use App\Repository\TaskRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -21,7 +23,7 @@ class TaskController extends AbstractController
     public const ERROR_DELETE = "Impossible de supprimer la tâche n°%d car elle n'existe pas.";
 
     #[Route('/projet/{id}/tache/creer', name: 'task_create')]
-    public function create(Request $request, EntityManagerInterface $entityManager, ProjectRepository $projectRepository, int $id): Response
+    public function create(Request $request, EntityManagerInterface $entityManager, ProjectRepository $projectRepository, UserRepository $userRepository, int $id): Response
     {
         $project = $projectRepository->findOneBy(['id' => $id]);
         if ($project === null) {
@@ -33,11 +35,14 @@ class TaskController extends AbstractController
         }
         $task = new Task();
 
-        $form = $this->createForm(TaskType::class, $task);
+        $form = $this->createForm(TaskType::class, [
+            'task' => $task,
+            'users' => $project->getUsers()->toArray(),
+        ]);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $task = $form->getData();
+            $this->handleForm($form);
             $task->setProject($project);
 
             $entityManager->persist($task);
@@ -46,7 +51,7 @@ class TaskController extends AbstractController
             return $this->redirectToRoute('project_show', ['id' => $project->getId()]);
         }
 
-        return $this->render('task/add.html.twig', [
+        return $this->render('task/add-edit.html.twig', [
             'task' => $task,
             'form' => $form,
         ]);
@@ -64,11 +69,14 @@ class TaskController extends AbstractController
             ]);
         }
 
-        $form = $this->createForm(TaskType::class, $task);
+        $form = $this->createForm(TaskType::class, [
+            'task' => $task,
+            'users' => $task->getProject()->getUsers()->toArray(),
+        ]);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $task = $form->getData();
+            $task = $this->handleForm($form);
 
             $entityManager->persist($task);
             $entityManager->flush();
@@ -76,10 +84,21 @@ class TaskController extends AbstractController
             return $this->redirectToRoute('project_show', ['id' => $task->getProject()->getId()]);
         }
 
-        return $this->render('task/edit.html.twig', [
+        return $this->render('task/add-edit.html.twig', [
             'form' => $form,
             'task' => $task,
         ]);
+    }
+
+    protected function handleForm(FormInterface $form): Task
+    {
+        $task = $form->getData()['task'];
+        $task->setTitle($form->getData()['title']);
+        $task->setDescription($form->getData()['description']);
+        $task->setDeadline($form->getData()['deadline']);
+        $task->setStatusId($form->getData()['statusId']);
+        $task->setUser($form->getData()['user']);
+        return $task;
     }
 
     #[Route('/tache/{id}/supprimer', name: 'task_delete', requirements: ['id' => Requirement::POSITIVE_INT])]
