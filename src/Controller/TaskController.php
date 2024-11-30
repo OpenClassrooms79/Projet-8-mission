@@ -10,18 +10,26 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 
 class TaskController extends AbstractController
 {
+    public const ERROR_TITLE = 'Tâche inexistante';
+    public const ERROR_CREATE = "Impossible de créer la tâche car le projet n°%d n'existe pas.";
+    public const ERROR_EDIT = "Impossible de modifier la tâche n°%d car elle n'existe pas.";
+    public const ERROR_DELETE = "Impossible de supprimer la tâche n°%d car elle n'existe pas.";
+
     #[Route('/projet/{id}/tache/creer', name: 'task_create')]
     public function create(Request $request, EntityManagerInterface $entityManager, ProjectRepository $projectRepository, int $id): Response
     {
         $project = $projectRepository->findOneBy(['id' => $id]);
         if ($project === null) {
-            throw new NotFoundHttpException('Ce projet n\'existe pas.');
+            return $this->forward('App\Controller\ErrorController::index', [
+                'title' => ProjectController::ERROR_TITLE,
+                'message' => self::ERROR_CREATE,
+                'id' => $id,
+            ]);
         }
         $task = new Task();
 
@@ -39,7 +47,6 @@ class TaskController extends AbstractController
         }
 
         return $this->render('task/add.html.twig', [
-            'controller_name' => 'TaskController',
             'task' => $task,
             'form' => $form,
         ]);
@@ -50,7 +57,11 @@ class TaskController extends AbstractController
     {
         $task = $taskRepository->findOneBy(['id' => $id]);
         if ($task === null) {
-            throw new NotFoundHttpException('Cette tâche n\'existe pas.');
+            return $this->forward('App\Controller\ErrorController::index', [
+                'title' => self::ERROR_TITLE,
+                'message' => self::ERROR_EDIT,
+                'id' => $id,
+            ]);
         }
 
         $form = $this->createForm(TaskType::class, $task);
@@ -66,7 +77,6 @@ class TaskController extends AbstractController
         }
 
         return $this->render('task/edit.html.twig', [
-            'controller_name' => 'TaskController',
             'form' => $form,
             'task' => $task,
         ]);
@@ -77,7 +87,11 @@ class TaskController extends AbstractController
     {
         $task = $taskRepository->findOneBy(['id' => $id]);
         if ($task === null) {
-            throw new NotFoundHttpException('Cette tâche n\'existe pas.');
+            return $this->forward('App\Controller\ErrorController::index', [
+                'title' => self::ERROR_TITLE,
+                'message' => self::ERROR_DELETE,
+                'id' => $id,
+            ]);
         }
 
         $entityManager->remove($task);

@@ -11,7 +11,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 use Symfony\Component\Routing\Requirement\Requirement;
@@ -20,6 +19,10 @@ use function ksort;
 
 class ProjectController extends AbstractController
 {
+    public const ERROR_TITLE = 'Projet inexistant';
+    public const ERROR_SHOW = "Impossible d'afficher le projet n°%d car il n'existe pas.";
+    public const ERROR_EDIT = "Impossible de modifier le projet n°%d car il n'existe pas.";
+
     #[Route('/', name: 'project_index')]
     public function index(ProjectRepository $projectRepository): Response
     {
@@ -33,7 +36,11 @@ class ProjectController extends AbstractController
     {
         $project = $projectRepository->findOneBy(['id' => $id]);
         if ($project === null) {
-            throw new NotFoundHttpException('Ce projet n\'existe pas.');
+            return $this->forward('App\Controller\ErrorController::index', [
+                'title' => self::ERROR_TITLE,
+                'message' => self::ERROR_SHOW,
+                'id' => $id,
+            ]);
         }
         $sortedTasks = [];
         $tasks = $project->getTasks();
@@ -82,11 +89,15 @@ class ProjectController extends AbstractController
     }
 
     #[Route('/projet/{id}/modifier', name: 'project_edit', requirements: ['id' => Requirement::POSITIVE_INT])]
-    public function edit(Request $request, Project $id, EntityManagerInterface $entityManager, ProjectRepository $projectRepository, UserRepository $userRepository): Response
+    public function edit(Request $request, int $id, EntityManagerInterface $entityManager, ProjectRepository $projectRepository, UserRepository $userRepository): Response
     {
         $project = $projectRepository->findOneBy(['id' => $id]);
         if ($project === null) {
-            throw new NotFoundHttpException('Ce projet n\'existe pas.');
+            return $this->forward('App\Controller\ErrorController::index', [
+                'title' => self::ERROR_TITLE,
+                'message' => self::ERROR_EDIT,
+                'id' => $id,
+            ]);
         }
 
         $form = $this->createForm(ProjectType::class, [
