@@ -35,6 +35,7 @@ class TaskType extends AbstractType
                 'data' => $options['data']['task']->getStatusId(), // valeur par défaut
             ])->add('user', ChoiceType::class, [
                 'label' => 'Membre',
+                'placeholder' => '',
                 'choice_label' => function (User $user) {
                     return $user->getFullName();
                 },
