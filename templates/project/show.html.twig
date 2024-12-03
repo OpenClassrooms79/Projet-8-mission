@@ -32,7 +32,7 @@
                                 <p>{{ task.description }}</p>
                                 <div class="task-infos">
                                     <div class="task-deadline">
-                                        <i class="fa-regular fa-calendar"></i> {{ task.deadline | date("m/d/Y") }}
+                                        <i class="fa-regular fa-calendar"></i> {{ task.deadline | date("d/m/Y") }}
                                     </div>
                                     {% if task.user %}
                                         <div class="mini-user" title="{{ task.user.fullname }}">

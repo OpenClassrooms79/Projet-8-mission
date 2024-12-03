@@ -11,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class TaskType extends AbstractType
 {
@@ -36,11 +37,18 @@ class TaskType extends AbstractType
             ])->add('user', ChoiceType::class, [
                 'label' => 'Membre',
                 'placeholder' => '',
+                'required' => false,
                 'choice_label' => function (User $user) {
                     return $user->getFullName();
                 },
                 'choices' => $options['data']['users'], // liste des valeurs possibles
                 'data' => $options['data']['task']->getUser(), // valeur par défaut
+                /*'constraints' => [
+                    new Assert\Expression([
+                        'expression' => 'this["statusId"] == 1 or value !== null',
+                        'message' => 'User is required unless statusId is 1',
+                    ]),
+                ],*/
             ]);
     }
 

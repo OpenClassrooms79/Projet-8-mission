@@ -7,6 +7,7 @@ use App\Form\TaskType;
 use App\Repository\ProjectRepository;
 use App\Repository\TaskRepository;
 use App\Repository\UserRepository;
+use App\Status;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
@@ -44,6 +45,11 @@ class TaskController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->handleForm($form);
             $task->setProject($project);
+            if ($task->getUser() === null) {
+                $task->setStatusId(Status::TO_DO);
+            } elseif ($task->getStatusId() === Status::TO_DO) {
+                $task->setUser(null);
+            }
 
             $entityManager->persist($task);
             $entityManager->flush();
@@ -77,6 +83,11 @@ class TaskController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $task = $this->handleForm($form);
+            if ($task->getUser() === null) {
+                $task->setStatusId(Status::TO_DO);
+            } elseif ($task->getStatusId() === Status::TO_DO) {
+                $task->setUser(null);
+            }
 
             $entityManager->persist($task);
             $entityManager->flush();
