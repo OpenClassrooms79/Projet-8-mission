@@ -31,8 +31,8 @@
         {{ form_row(form.user) }}
     </div>
     <br>
-    <button class="button button-submit">{% if task.title==null %}Ajouter{% else %}Modifier{% endif %}</button>
-    {% if task.title!=null %}
+    <button class="button button-submit">{% if task.id==null %}Ajouter{% else %}Modifier{% endif %}</button>
+    {% if task.id!=null %}
         <a href="/tache/{{ task.id }}/supprimer" class="delete-task">Supprimer la tâche</a>
     {% endif %}
     {{ form_rest(form) }}
