@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\TaskRepository;
-use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -16,13 +15,13 @@ class Task
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $title = null;
+    private string $title = '';
 
     #[ORM\Column(type: Types::TEXT)]
-    private ?string $description = null;
+    private string $description = '';
 
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?DateTimeInterface $deadline = null;
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    private \DateTimeInterface $deadline;
 
     #[ORM\ManyToOne(inversedBy: 'tasks')]
     private ?Project $project = null;
@@ -32,6 +31,11 @@ class Task
 
     #[ORM\Column]
     private ?int $statusId = null;
+
+    public function __construct()
+    {
+        $this->setDeadline(null);
+    }
 
     public function getId(): ?int
     {
@@ -45,14 +49,14 @@ class Task
         return $this;
     }
 
-    public function getTitle(): ?string
+    public function getTitle(): string
     {
         return $this->title;
     }
 
-    public function setTitle(string $title): static
+    public function setTitle(?string $title): static
     {
-        $this->title = $title;
+        $this->title = $title ?? '';
 
         return $this;
     }
@@ -62,21 +66,21 @@ class Task
         return $this->description;
     }
 
-    public function setDescription(string $description): static
+    public function setDescription(?string $description): static
     {
-        $this->description = $description;
+        $this->description = $description ?? '';
 
         return $this;
     }
 
-    public function getDeadline(): ?DateTimeInterface
+    public function getDeadline(): \DateTimeInterface
     {
         return $this->deadline;
     }
 
-    public function setDeadline(?DateTimeInterface $deadline): static
+    public function setDeadline(?\DateTimeInterface $deadline): static
     {
-        $this->deadline = $deadline;
+        $this->deadline = $deadline ?? new \DateTime('now');
 
         return $this;
     }

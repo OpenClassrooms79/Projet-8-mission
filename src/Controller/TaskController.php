@@ -7,10 +7,8 @@ use App\Form\TaskType;
 use App\Repository\ProjectRepository;
 use App\Repository\TaskRepository;
 use App\Repository\UserRepository;
-use App\Status;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -36,20 +34,13 @@ class TaskController extends AbstractController
         }
         $task = new Task();
 
-        $form = $this->createForm(TaskType::class, [
-            'task' => $task,
+        $form = $this->createForm(TaskType::class, $task, [
             'users' => $project->getUsers()->toArray(),
         ]);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->handleForm($form);
             $task->setProject($project);
-            if ($task->getUser() === null) {
-                $task->setStatusId(Status::TO_DO);
-            } elseif ($task->getStatusId() === Status::TO_DO) {
-                $task->setUser(null);
-            }
 
             $entityManager->persist($task);
             $entityManager->flush();
@@ -75,20 +66,16 @@ class TaskController extends AbstractController
             ]);
         }
 
-        $form = $this->createForm(TaskType::class, [
-            'task' => $task,
-            'users' => $task->getProject()->getUsers()->toArray(),
-        ]);
+        $form = $this->createForm(
+            TaskType::class,
+            $task,
+            [
+                'users' => $task->getProject()->getUsers()->toArray(),
+            ],
+        );
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $task = $this->handleForm($form);
-            if ($task->getUser() === null) {
-                $task->setStatusId(Status::TO_DO);
-            } elseif ($task->getStatusId() === Status::TO_DO) {
-                $task->setUser(null);
-            }
-
             $entityManager->persist($task);
             $entityManager->flush();
 
@@ -99,17 +86,6 @@ class TaskController extends AbstractController
             'form' => $form,
             'task' => $task,
         ]);
-    }
-
-    protected function handleForm(FormInterface $form): Task
-    {
-        $task = $form->getData()['task'];
-        $task->setTitle($form->getData()['title']);
-        $task->setDescription($form->getData()['description']);
-        $task->setDeadline($form->getData()['deadline']);
-        $task->setStatusId($form->getData()['statusId']);
-        $task->setUser($form->getData()['user']);
-        return $task;
     }
 
     #[Route('/tache/{id}/supprimer', name: 'task_delete', requirements: ['id' => Requirement::POSITIVE_INT])]
