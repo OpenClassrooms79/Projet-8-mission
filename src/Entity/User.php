@@ -76,9 +76,9 @@ class User
         return $this->firstName;
     }
 
-    public function setFirstName(string $firstName): static
+    public function setFirstName(?string $firstName): static
     {
-        $this->firstName = $firstName;
+        $this->firstName = $firstName ?? '';
 
         return $this;
     }
@@ -88,9 +88,9 @@ class User
         return $this->name;
     }
 
-    public function setName(string $name): static
+    public function setName(?string $name): static
     {
-        $this->name = $name;
+        $this->name = $name ?? '';
 
         return $this;
     }
@@ -100,9 +100,9 @@ class User
         return $this->email;
     }
 
-    public function setEmail(string $email): static
+    public function setEmail(?string $email): static
     {
-        $this->email = $email;
+        $this->email = $email ?? '';
 
         return $this;
     }
@@ -148,9 +148,9 @@ class User
         return $this->entryDate;
     }
 
-    public function setEntryDate(DateTimeInterface $entryDate): static
+    public function setEntryDate(?DateTimeInterface $entryDate): static
     {
-        $this->entryDate = $entryDate;
+        $this->entryDate = $entryDate ?? new \DateTime('now');
 
         return $this;
     }
