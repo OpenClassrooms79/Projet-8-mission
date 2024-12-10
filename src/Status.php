@@ -2,19 +2,32 @@
 
 namespace App;
 
-class Status
+use function array_rand;
+
+enum Status: int
 {
-    public const TO_DO = 1;
-    public const DOING = 2;
-    public const DONE = 3;
-    public const STATUSES = [
-        self::TO_DO => 'To Do',
-        self::DOING => 'Doing',
-        self::DONE => 'Done',
+    case TO_DO = 1;
+    case  DOING = 2;
+    case DONE = 3;
+
+    protected const STATUSES = [
+        self::TO_DO->value => 'To Do',
+        self::DOING->value => 'Doing',
+        self::DONE->value => 'Done',
     ];
 
-    public static function getRandom(): int
+    public static function getAll(): array
     {
-        return array_rand(self::STATUSES);
+        return self::STATUSES;
+    }
+
+    public static function getText(int $value): string
+    {
+        return self::STATUSES[$value];
+    }
+
+    public static function getRandomValue(): int
+    {
+        return self::cases()[array_rand(self::cases())]->value;
     }
 }

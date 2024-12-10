@@ -105,7 +105,7 @@ class AppFixtures extends Fixture
     {
         for ($i = 1; $i <= self::NB_TASKS; $i++) {
             $task = new Task();
-            $statusId = Status::getRandom();
+            $statusId = Status::getRandomValue();
             $project = $this->projects[array_rand($this->projects)];
             $userArray = $project->getUsers()->toArray();
             $task
@@ -115,7 +115,7 @@ class AppFixtures extends Fixture
                 ->setDeadline($faker->dateTimeBetween('-5 year'))
                 ->setProject($project)
                 ->setStatusId($statusId);
-            if ($statusId !== Status::TO_DO) {
+            if ($statusId !== Status::TO_DO->value) {
                 $task->setUser($userArray[array_rand($userArray)]);
             }
 

@@ -52,7 +52,7 @@ class ProjectController extends AbstractController
         return $this->render('project/show.html.twig', [
             'project' => $project,
             'tasks' => $sortedTasks,
-            'statuses' => Status::STATUSES,
+            'statuses' => Status::getAll(),
         ]);
     }
 
@@ -61,19 +61,17 @@ class ProjectController extends AbstractController
     {
         $project = new Project();
 
-        $form = $this->createForm(ProjectType::class, [
-            'project' => $project,
-            'users' => $project->getUsers()->toArray(),
-            'all_users' => $userRepository->findAll(),
-        ]);
+        $form = $this->createForm(
+            ProjectType::class,
+            $project,
+            [
+                'users' => $project->getUsers()->toArray(),
+                'all_users' => $userRepository->findAll(),
+            ],
+        );
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $project->setName($form->getData()['name']);
-            foreach ($form->getData()['users'] as $user) {
-                $project->addUser($user);
-            }
-
             $entityManager->persist($project);
             $entityManager->flush();
 
@@ -88,7 +86,8 @@ class ProjectController extends AbstractController
         );
     }
 
-    #[Route('/projet/{id}/modifier', name: 'project_edit', requirements: ['id' => Requirement::POSITIVE_INT])]
+    #[Route('/projet/{id}/modifier1', name: 'project_edit1', requirements: ['id' => Requirement::POSITIVE_INT])]
+    #[Route('/projet/{id}/modifier2', name: 'project_edit2', requirements: ['id' => Requirement::POSITIVE_INT])]
     public function edit(Request $request, int $id, EntityManagerInterface $entityManager, ProjectRepository $projectRepository, UserRepository $userRepository): Response
     {
         $project = $projectRepository->findOneBy(['id' => $id]);
@@ -100,23 +99,28 @@ class ProjectController extends AbstractController
             ]);
         }
 
-        $form = $this->createForm(ProjectType::class, [
-            'project' => $project,
-            'users' => $project->getUsers()->toArray(),
-            'all_users' => $userRepository->findAll(),
-        ]);
+        // permet de passer le nom original du projet au template
+        $projectCopy = clone $project;
+
+        $form = $this->createForm(
+            ProjectType::class,
+            $project,
+            [
+                'users' => $project->getUsers()->toArray(),
+                'all_users' => $userRepository->findAll(),
+            ],
+        );
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $project->setName($form->getData()['name']);
-            $project->removeAllUsers();
-            foreach ($form->getData()['users'] as $user) {
-                $project->addUser($user);
-            }
-
+            $project = $form->getData();
             $entityManager->persist($project);
             $entityManager->flush();
 
+            // retourner sur la bonne page en fonction de la route appelée
+            if ($request->attributes->get('_route') === 'project_edit1') {
+                return $this->redirectToRoute('project_index');
+            }
             return $this->redirectToRoute('project_show', ['id' => $project->getId()]);
         }
 
@@ -124,7 +128,7 @@ class ProjectController extends AbstractController
             'project/add-edit.html.twig',
             [
                 'form' => $form,
-                'project_name' => $project->getName(),
+                'project_name' => $projectCopy->getName(),
             ],
         );
     }
